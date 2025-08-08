@@ -1,10 +1,10 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function SignInPage() {
+function SignInForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const searchParams = useSearchParams();
@@ -57,7 +57,6 @@ export default function SignInPage() {
           </button>
         </form>
 
-        {/* Demo Credentials */}
         <div className="mt-6 text-sm text-gray-700 dark:text-gray-300 border-t border-gray-300 dark:border-gray-700 pt-4">
           <p className="font-semibold mb-1">💡 Demo Credentials:</p>
           <ul className="space-y-1">
@@ -73,5 +72,13 @@ export default function SignInPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="text-center p-6">Loading...</div>}>
+      <SignInForm />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 type Product = {
@@ -11,7 +11,7 @@ type Product = {
   description: string;
 };
 
-export default function PaginationPage() {
+function PaginationContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -21,7 +21,6 @@ export default function PaginationPage() {
   const [total, setTotal] = useState(0);
   const limit = 10;
 
-  // Fetch products whenever page changes
   useEffect(() => {
     async function fetchProducts() {
       const skip = (page - 1) * limit;
@@ -35,14 +34,11 @@ export default function PaginationPage() {
     fetchProducts();
   }, [page]);
 
-  // Keep URL in sync
   useEffect(() => {
     router.push(`?page=${page}`);
   }, [page, router]);
 
   const totalPages = Math.ceil(total / limit);
-
-  // Convert USD → INR (approx)
   const usdToInr = (usd: number) => Math.round(usd * 83.5);
 
   return (
@@ -55,7 +51,6 @@ export default function PaginationPage() {
             key={product.id}
             className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col transition-transform duration-300 hover:scale-105 hover:shadow-2xl"
           >
-            {/* Image Section with hover zoom */}
             <div className="overflow-hidden relative group">
               <img
                 src={product.thumbnail}
@@ -63,15 +58,11 @@ export default function PaginationPage() {
                 className="w-full h-52 object-cover transform transition-transform duration-500 group-hover:scale-110"
               />
             </div>
-
-            {/* Content Section */}
             <div className="p-4 flex flex-col flex-grow">
               <h2 className="text-lg font-semibold mb-2 truncate">{product.title}</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
                 {product.description}
               </p>
-
-              {/* Price + Button Section */}
               <div className="mt-auto border-t border-gray-200 dark:border-gray-700 pt-4 flex items-center justify-between">
                 <span className="text-lg font-bold text-green-600 dark:text-green-400">
                   ₹{usdToInr(product.price).toLocaleString("en-IN")}
@@ -88,7 +79,6 @@ export default function PaginationPage() {
         ))}
       </div>
 
-      {/* Pagination controls */}
       <div className="flex gap-4 mt-10">
         <button
           onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -109,5 +99,13 @@ export default function PaginationPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function PaginationPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center">Loading...</div>}>
+      <PaginationContent />
+    </Suspense>
   );
 }
