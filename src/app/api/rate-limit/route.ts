@@ -10,11 +10,9 @@ const ipStore = new Map<
 >();
 
 export async function GET(req: NextRequest) {
-  // Get IP address (fall back to unknown)
-  const ip =
-    req.headers.get("x-forwarded-for") ||
-    req.ip ||
-    "unknown";
+  // Get IP address from headers
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : 'unknown';
 
   const now = Date.now();
   const record = ipStore.get(ip);
@@ -25,18 +23,19 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true, remaining: MAX_REQUESTS - 1 });
   }
 
-  record.count++;
+  // Increment request count
+  record.count += 1;
+  ipStore.set(ip, record);
 
   if (record.count > MAX_REQUESTS) {
     return NextResponse.json(
-      { error: "Too Many Requests" },
-      { status: 429 }
+      { error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": "60" } }
     );
   }
 
-  ipStore.set(ip, record);
   return NextResponse.json({
     ok: true,
-    remaining: MAX_REQUESTS - record.count,
+    remaining: Math.max(0, MAX_REQUESTS - record.count),
   });
 }
