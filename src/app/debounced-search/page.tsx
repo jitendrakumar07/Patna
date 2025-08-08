@@ -50,16 +50,16 @@ export default function DebouncedSearchPage() {
       <h1 className="text-3xl font-bold mb-8">📚 Debounced Book Search</h1>
 
       {/* Search Input */}
-      <div className="w-full max-w-lg relative">
+      <div className="w-full max-w-lg relative text-white">
         <input
           type="text"
           placeholder="Search for books..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full border border-gray-300 dark:border-gray-700 rounded-full px-5 py-3 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 dark:border-gray-700 rounded-full px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white"
         />
         {loading && (
-          <span className="absolute right-5 top-3 text-sm text-gray-500 animate-pulse">
+          <span className="absolute right-5 top-3 text-sm text-white animate-pulse">
             Loading...
           </span>
         )}
